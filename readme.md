@@ -98,5 +98,3 @@ Deberías ver listados de la bandeja de entrada y enviados de dos usuarios de ej
 - Validaciones de formato de email y normalización.
 - Búsqueda y filtrado (por remitente, asunto, fecha, leído/no leído).
 - Persistencia (archivos JSON, SQLite) y repositorios.
-- Autenticación básica y control de acceso.
-- Tests unitarios (pytest) y mocks de interfaces.
