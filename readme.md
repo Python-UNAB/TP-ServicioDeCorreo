@@ -1,4 +1,4 @@
-# TP - Servidor de Correo (Primera)
+# TP - Servidor de Correo (Primera entrega)
 
 Se va a desarrollar un modelo de servidor de correo, donde el usuario debera registrarse y enviara mensajes a otros usuarios registrados dentro del servidor.
 Por defecto se dejo configurado un usuario registrado para la verificación de funcionalidad del mismo.
