@@ -102,10 +102,9 @@ class Carpeta:
         return [m.mostrar_resumen() for m in self.__mensajes]
 	
 def menu_servidor():
-	server = ServidorCorreo()
-	2
+	servidor = ServidorCorreo()
 	try:
-		server.registrar_usuario("MikeMz", "1234")
+		servidor.registrar_usuario("MikeMz", "1234")
 	except ValueError:
 		pass
 	while True:
@@ -118,7 +117,7 @@ def menu_servidor():
 		if opcion == "1":
 			username = input("Usuario: ")
 			password = input("Contraseña: ")
-			usuario = server.autenticar(username, password)
+			usuario = servidor.autenticar(username, password)
 			if usuario:
 				print(f"Bienvenido, {username}!")
 				#Acá iría el menu de inicio del usuario autenticado
@@ -128,7 +127,7 @@ def menu_servidor():
 			username = input("Nuevo usuario: ")
 			password = input("Nueva contraseña: ")
 			try:
-				print(server.registrar_usuario(username, password))
+				print(servidor.registrar_usuario(username, password))
 			except ValueError as e:
 				print(e)
 		elif opcion == "3":
