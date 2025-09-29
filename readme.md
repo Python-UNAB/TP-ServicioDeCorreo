@@ -1,14 +1,13 @@
-# TP - Servidor de Correo (Primera entrega)
+# TP - Servidor de Correo
 
-Se va a desarrollar un modelo de servidor de correo, donde el usuario debera registrarse y enviara mensajes a otros usuarios registrados dentro del servidor.
-Por defecto se dejo configurado un usuario registrado para la verificación de funcionalidad del mismo.
+Se realizaron las correcciones solicitadas en la primer entrega, respecto a la modularización del proyecto para incrementar la mantenibilidad del código. Ademas se agregó la carpeta docs con un archivo abstract.md donde se argumentan las desiciones del diseño.
 
 ## Objetivos
 
-- Clases principales: `Usuario`, `Mensaje`, `Carpeta`, `ServidorCorreo`.
-- Encapsulamiento mediante propiedades y métodos de acceso.
-- Documentación con diagrama de clases.
-
+- Modelar las clases principales: ServidorCorreo, Usuario, Carpeta y Mensaje.
+- Aplicar encapsulamiento mediante atributos privados y propiedades/métodos de acceso.
+- Implementar una interfaz mínima de interacción (registro, autenticación y envío/listado de mensajes).
+- Ver también el [Abstract](./docs/abstract.md) con objetivos, decisiones y alcance.
 
 ## Diagrama de clases (UML)
 
@@ -65,7 +64,7 @@ Ejecuta el demo incluido:
 
 ```powershell
 # Windows PowerShell
-python .\app.py
+python -m app.main
 ```
 
 ## Manual de uso:
@@ -76,9 +75,9 @@ python .\app.py
 ## Proximos pasos:
 
 - Implementar menú con el Framework tkinter
-- Realizar diagrama de flujo en Figma. 
 - Gestionar el envío de mensajes con un metodo "enviar_mensaje"
 - Implementación del método de mostrar_resumen
 
 ## Modalidad de trabajo:
-	- Se colaboró en conjunto, y se trabajó con LiveShare permitiendo un desarrollo coordinado.
+
+- Se colaboró en conjunto, y se trabajó con LiveShare permitiendo un desarrollo coordinado.
