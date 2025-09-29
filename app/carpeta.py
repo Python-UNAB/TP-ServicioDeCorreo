@@ -11,4 +11,4 @@ class Carpeta:
         self.__mensajes.append(mensaje)
 
     def listar_mensajes(self):
-        return [m.mostrar_resumen() for m in self.__mensajes]
+        return list(self.__mensajes)
