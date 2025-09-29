@@ -21,17 +21,14 @@ class ServidorCorreo:
 	
 	def mostrar_usuarios_registrados(self):
 		return self.__usuarios.keys()
-	
+
 	def enviar_mensaje(self, remitente, destinatario, asunto, cuerpo):
 		if remitente not in self.__usuarios:
-			return f'El usuario {remitente} no existe'
+			raise ValueError("El remitente no existe.")
 		if destinatario not in self.__usuarios:
-			return f'El usuario {destinatario} no existe'
+			raise ValueError("El destinatario no existe.")
 		rem = self.__usuarios[remitente]
 		dest = self.__usuarios[destinatario]
-		msg = Mensaje(rem, dest, asunto, cuerpo)
-		#Se guarda en "Enviados" del remitente 
-		rem.obtener_carpeta("Enviados").agregar_mensaje(msg)
-		#Se guarda en "Entrada" del destinatario
-		dest.obtener_carpeta("Entrada").agregar_mensaje(msg)
-		return True
+		mensaje = Mensaje(rem, dest, asunto, cuerpo)
+		rem.obtener_carpeta("Enviados").agregar_mensaje(mensaje)
+		dest.obtener_carpeta("Entrada").agregar_mensaje(mensaje)
