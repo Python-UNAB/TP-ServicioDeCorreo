@@ -1,7 +1,5 @@
 from .servidor import ServidorCorreo
 
-
-
 def menu_usuario(servidor: ServidorCorreo, usuario):
     print(f"\nSesión: {usuario.username}")
     while True:
