@@ -1,6 +1,7 @@
 # TP - Servidor de Correo
 
 Se realizaron las correcciones solicitadas en la primer entrega, respecto a la modularización del proyecto para incrementar la mantenibilidad del código. Ademas se agregó la carpeta docs con un archivo abstract.md donde se argumentan las decisiones del diseño.
+Ademas se implementó el metodo para enviar mensajes.
 
 ## Objetivos
 
@@ -75,7 +76,6 @@ python -m app.main
 ## Proximos pasos:
 
 - Implementar menú con el Framework tkinter
-- Gestionar el envío de mensajes con un metodo "enviar_mensaje"
 - Implementación del método de mostrar_resumen
 
 ## Modalidad de trabajo:
