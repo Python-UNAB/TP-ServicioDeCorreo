@@ -6,6 +6,9 @@ Decisiones de diseño:
 - Usuario posee carpetas predefinidas (Entrada, Enviados) para simplificar el flujo básico.
 - Mensaje es inmutable en sus metadatos luego de creado; solo se muestra o resume.
 - Modularización por archivos: cada clase en su módulo, más `app/main.py` como punto de entrada.
+- Gestión recursiva de carpetas que permite búsquedas y movimientos sobre árboles arbitrarios.
+- Filtros declarados como listas de reglas (diccionarios) para enrutar mensajes automáticamente.
+- Cola de prioridad para atender mensajes urgentes conservando el orden por prioridad y llegada.
 
 Alcance de esta entrega:
 
