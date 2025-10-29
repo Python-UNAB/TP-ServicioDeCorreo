@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class Mensaje:
-	def __init__(self, remitente, destinatario, asunto: str, cuerpo: str, *, urgente: bool = False, prioridad: int = 0):
+	def __init__(self, remitente, destinatario, asunto: str, cuerpo: str, *, urgente: bool = False):
 		"""Representa un mensaje entre usuarios del sistema.
 
 		remitente: Usuario
@@ -15,7 +15,6 @@ class Mensaje:
 		self.__cuerpo = cuerpo
 		self.__fecha = datetime.now()
 		self.__urgente = urgente
-		self.__prioridad = prioridad
 
 	@property
 	def mostrar_remitente(self):
@@ -37,10 +36,6 @@ class Mensaje:
 	@property
 	def es_urgente(self):
 		return self.__urgente
-
-	@property
-	def prioridad(self):
-		return self.__prioridad
 	
 	def mostrar_correo(self):
 		return (

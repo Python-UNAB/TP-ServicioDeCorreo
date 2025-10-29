@@ -14,17 +14,17 @@ Ademas se implementó el metodo para enviar mensajes.
 
 ## Complejidad y eficiencia
 
-- **Búsqueda y filtrado**: la búsqueda recorre todas las carpetas y subcarpetas (`O(n)` respecto a la cantidad total de mensajes almacenados).
-- **Movimiento de mensajes**: la extracción y reubicación recursiva también es `O(n)` en el peor caso, ya que puede visitar cada carpeta.
-- **Aplicación de filtros**: por cada mensaje recibido se evalúan las reglas configuradas (`O(r)` donde `r` es la cantidad de filtros del usuario); al cumplirse un criterio se detiene la evaluación.
-- **Cola de urgentes**: las inserciones y extracciones de la cola de prioridad tienen costo `O(log u)` (`u` = mensajes urgentes en espera).
+- **Búsqueda recursiva**: la búsqueda recorre todas las carpetas y subcarpetas de forma recursiva. En el peor caso es `O(n)` donde `n` es la cantidad total de mensajes almacenados en todo el árbol de carpetas.
+- **Movimiento de mensajes**: la extracción y reubicación también recorre recursivamente, con complejidad `O(n)` en el peor caso si se visita cada carpeta del árbol.
+- **Aplicación de filtros**: por cada mensaje recibido se evalúan las reglas configuradas (`O(r)` donde `r` es la cantidad de filtros del usuario). La evaluación se detiene cuando un filtro coincide.
+- **Cola de urgentes (FIFO)**: las inserciones al inicio y extracciones al final de la lista son `O(1)` amortizado. No se usa prioridad numérica; el orden es por llegada (primero en llegar, primero en salir).
 
 ## Casos límite considerados
 
-- Intento de mover mensajes hacia carpetas inexistentes: se informa el error o se crea la carpeta bajo confirmación del usuario.
-- Búsquedas sin coincidencias: se devuelve una lista vacía sin fallar.
-- Recepción de mensajes urgentes repetidos: la cola los ordena por prioridad y fecha de llegada, evitando bloqueos.
-- Filtros con carpetas destino ausentes: pueden crearse automáticamente o ignorarse si el usuario así lo decide.
+- **Carpetas inexistentes**: al intentar mover mensajes hacia una carpeta que no existe, el sistema informa el error o crea la carpeta automáticamente según la configuración del usuario.
+- **Búsquedas sin resultados**: se devuelve una lista vacía sin generar errores.
+- **Cola de urgentes vacía**: al consultar mensajes urgentes cuando no hay ninguno pendiente, se informa al usuario sin fallar.
+- **Filtros con carpetas destino ausentes**: pueden crearse automáticamente (si `crear_destino=True`) o ignorarse si el usuario prefiere no crear carpetas nuevas.
 
 ## Diagrama de clases (UML)
 
@@ -93,20 +93,24 @@ pip install pytest  # en caso de no tenerlo instalado
 pytest -q
 ```
 
-## Manual de uso:
+## Manual de uso
 
-- Ejecutar el codigo
-- Seleccionar alguna de las opciones listadas del menú
-  - Crear subcarpetas anidadas según sea necesario (por ejemplo `Entrada/Proyectos/2025`).
-  - Configurar filtros por asunto para organizar la bandeja automática.
-  - Marcar mensajes como urgentes y asignar prioridad numérica (0 es la más alta).
-  - Atender mensajes urgentes desde el menú del servidor.
+- Ejecutar el código con `python -m app.main` desde la raíz del proyecto.
+- Seleccionar alguna de las opciones listadas en el menú:
+  - **Registrarse o ingresar** con usuario y contraseña.
+  - **Enviar mensajes** a otros usuarios registrados, marcándolos como urgentes si es necesario.
+  - **Ver mensajes** de Entrada o Enviados, seleccionando un mensaje para leer el contenido completo.
+  - **Crear subcarpetas** anidadas (ejemplo: `Entrada/Proyectos/2025`).
+  - **Buscar y mover mensajes** por texto en asunto o cuerpo, de forma recursiva en toda la jerarquía.
+  - **Configurar filtros** por asunto para organizar la bandeja automáticamente.
+  - **Ver mensajes urgentes** pendientes desde el menú de usuario (se extraen en orden de llegada).
 
-## Proximos pasos:
+## Próximos pasos
 
-- Implementar menú con el Framework tkinter
-- Implementación del método de mostrar_resumen
-- Integración de Arboles
+- Implementar interfaz gráfica con tkinter o web con Flask.
+- Persistencia en archivo JSON o base de datos SQLite.
+- Validaciones adicionales (formato de email, longitud de mensajes).
+- Notificaciones push o email real para nuevos mensajes.
 
 ## Modalidad de trabajo:
 

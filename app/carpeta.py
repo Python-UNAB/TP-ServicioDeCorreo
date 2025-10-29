@@ -38,13 +38,15 @@ class Carpeta:
         return dict(self.__subcarpetas)
 
     def buscar_mensajes(self, criterio):
+        """Busca recursivamente mensajes que cumplen el criterio en esta carpeta y todas sus subcarpetas."""
         encontrados = [m for m in self.__mensajes if criterio(m)]
+        # Recursión: buscar en cada subcarpeta
         for subcarpeta in self.__subcarpetas.values():
             encontrados.extend(subcarpeta.buscar_mensajes(criterio))
         return encontrados
 
     def extraer_mensajes(self, criterio):
-        """Devuelve los mensajes que cumplen el criterio y los elimina de la carpeta y subcarpetas."""
+        """Extrae recursivamente mensajes que cumplen el criterio, eliminándolos de esta carpeta y subcarpetas."""
         retenidos = []
         extraidos = []
         for mensaje in self.__mensajes:
@@ -53,6 +55,7 @@ class Carpeta:
             else:
                 retenidos.append(mensaje)
         self.__mensajes = retenidos
+        # Recursión: extraer también de subcarpetas
         for subcarpeta in self.__subcarpetas.values():
             extraidos.extend(subcarpeta.extraer_mensajes(criterio))
         return extraidos

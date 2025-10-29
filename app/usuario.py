@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional
 
 from .carpeta import Carpeta
 
@@ -22,6 +22,7 @@ class Usuario:
 		return self.__password
 
 	def _navegar_ruta(self, ruta: str, *, crear: bool) -> Optional[Carpeta]:
+		"""Navega por una ruta de carpetas (ej: 'Entrada/Proyectos/2025'), creándolas si es necesario."""
 		partes = [p for p in ruta.split("/") if p]
 		if not partes:
 			return None
@@ -30,6 +31,7 @@ class Usuario:
 			carpeta = self.__carpetas.setdefault(partes[0], Carpeta(partes[0]))
 		elif carpeta is None:
 			return None
+		# Navegar recursivamente por subcarpetas
 		for nombre in partes[1:]:
 			siguiente = carpeta.obtener_subcarpeta(nombre)
 			if siguiente is None:
@@ -60,30 +62,25 @@ class Usuario:
 			rutas.extend(self.__listar_recursivo(subcarpeta, f"{prefijo}/{nombre}"))
 		return rutas
 
-	def recorrer_carpetas(self) -> Iterable[Tuple[str, Carpeta]]:
-		for nombre, carpeta in sorted(self.__carpetas.items()):
-			yield from self.__recorrer(carpeta, nombre)
-
-	def __recorrer(self, carpeta: Carpeta, ruta: str) -> Iterable[Tuple[str, Carpeta]]:
-		yield ruta, carpeta
-		for nombre, subcarpeta in sorted(carpeta.listar_subcarpetas().items()):
-			yield from self.__recorrer(subcarpeta, f"{ruta}/{nombre}")
-
 	def buscar_mensajes(self, criterio: Callable, carpeta_ruta: Optional[str] = None):
+		"""Busca mensajes que cumplen el criterio en la carpeta especificada o en todas."""
 		if carpeta_ruta:
 			carpeta = self.obtener_carpeta(carpeta_ruta)
 			if carpeta is None:
 				return []
 			return carpeta.buscar_mensajes(criterio)
+		# Buscar en todas las carpetas raíz
 		resultados = []
 		for carpeta in self.__carpetas.values():
 			resultados.extend(carpeta.buscar_mensajes(criterio))
 		return resultados
 
 	def mover_mensajes(self, criterio: Callable, destino_ruta: str, origen_ruta: Optional[str] = None, *, crear_destino: bool = False) -> int:
+		"""Mueve mensajes que cumplen el criterio desde el origen hacia el destino."""
 		destino = self._navegar_ruta(destino_ruta, crear=crear_destino)
 		if destino is None:
 			raise ValueError("La carpeta destino no existe")
+		# Determinar carpetas de origen
 		fuentes = []
 		if origen_ruta:
 			carpeta_origen = self.obtener_carpeta(origen_ruta)
@@ -92,6 +89,7 @@ class Usuario:
 			fuentes.append(carpeta_origen)
 		else:
 			fuentes = list(self.__carpetas.values())
+		# Extraer y mover mensajes
 		movidos = 0
 		for carpeta in fuentes:
 			extraidos = carpeta.extraer_mensajes(criterio)
@@ -112,17 +110,11 @@ class Usuario:
 			"crear_destino": crear_destino,
 		})
 
-	def quitar_filtro(self, nombre: str) -> bool:
-		for idx, filtro in enumerate(self.__filtros):
-			if filtro["nombre"] == nombre:
-				del self.__filtros[idx]
-				return True
-		return False
-
 	def listar_filtros(self) -> List[str]:
 		return [filtro["nombre"] for filtro in self.__filtros]
 
 	def aplicar_filtros(self, mensaje) -> Optional[str]:
+		"""Aplica filtros automáticos al mensaje recibido, moviéndolo si coincide con algún criterio."""
 		entrada = self.obtener_carpeta("Entrada")
 		if entrada is None:
 			return None
@@ -132,6 +124,7 @@ class Usuario:
 				destino = self._navegar_ruta(filtro["destino"], crear=filtro.get("crear_destino", False))
 				if destino is None:
 					continue
+				# Mover mensaje de Entrada a la carpeta destino del filtro
 				if entrada.eliminar_mensaje(mensaje):
 					destino.agregar_mensaje(mensaje)
 					return filtro["nombre"]

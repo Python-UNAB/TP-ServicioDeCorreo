@@ -1,16 +1,12 @@
-import heapq
-from itertools import count
-
 from .usuario import Usuario
 from .mensaje import Mensaje
 
 
 class ServidorCorreo:
-	"""El servidor principal. Permite registrar usuarios simulando una base de datos y los guarda en una lista, para poder autenticarse"""
+	"""Servidor principal que gestiona usuarios y enruta mensajes."""
 	def __init__(self):
-		self.__usuarios = {} #Diccionario con Usuarios (objeto) registrados
-		self.__cola_urgentes = []
-		self.__contador_urgentes = count()
+		self.__usuarios = {}  # Diccionario: username -> Usuario
+		self.__cola_urgentes = []  # Cola FIFO de mensajes urgentes
 
 	def registrar_usuario(self, username, password):
 		if username in self.__usuarios:
@@ -26,40 +22,37 @@ class ServidorCorreo:
 
 	def obtener_usuario(self, username):
 		return self.__usuarios.get(username)
-	
-	def mostrar_usuarios_registrados(self):
-		return self.__usuarios.keys()
 
-	def enviar_mensaje(self, remitente, destinatario, asunto, cuerpo, *, urgente: bool = False, prioridad: int = 0):
+	def enviar_mensaje(self, remitente, destinatario, asunto, cuerpo, *, urgente: bool = False):
+		"""Envía un mensaje entre dos usuarios registrados."""
 		if remitente not in self.__usuarios:
 			raise ValueError("El remitente no existe.")
 		if destinatario not in self.__usuarios:
 			raise ValueError("El destinatario no existe.")
 		rem = self.__usuarios[remitente]
 		dest = self.__usuarios[destinatario]
-		mensaje = Mensaje(rem, dest, asunto, cuerpo, urgente=urgente, prioridad=prioridad)
+		mensaje = Mensaje(rem, dest, asunto, cuerpo, urgente=urgente)
+		# Guardar en carpeta "Enviados" del remitente
 		rem.obtener_carpeta("Enviados").agregar_mensaje(mensaje)
+		# Guardar en carpeta "Entrada" del destinatario
 		entrada_dest = dest.obtener_carpeta("Entrada")
 		if entrada_dest is None:
 			dest.obtener_o_crear_carpeta("Entrada")
 			entrada_dest = dest.obtener_carpeta("Entrada")
 		entrada_dest.agregar_mensaje(mensaje)
+		# Aplicar filtros automáticos del destinatario
 		dest.aplicar_filtros(mensaje)
+		# Si es urgente, agregar a la cola FIFO
 		if urgente:
-			heapq.heappush(self.__cola_urgentes, (prioridad, next(self.__contador_urgentes), mensaje))
+			self.__cola_urgentes.insert(0, mensaje)  # Inserta al inicio (más reciente)
 		return mensaje
 
 	def tiene_mensajes_urgentes(self) -> bool:
+		"""Verifica si hay mensajes urgentes pendientes."""
 		return bool(self.__cola_urgentes)
 
 	def extraer_mensaje_urgente(self):
+		"""Extrae el mensaje urgente más antiguo (FIFO)."""
 		if not self.__cola_urgentes:
 			return None
-		_, _, mensaje = heapq.heappop(self.__cola_urgentes)
-		return mensaje
-
-	def registrar_filtro(self, username, nombre, condicion, destino_ruta, *, crear_destino=True):
-		usuario = self.__usuarios.get(username)
-		if usuario is None:
-			raise ValueError("El usuario no existe")
-		usuario.agregar_filtro(nombre, condicion, destino_ruta, crear_destino=crear_destino)
+		return self.__cola_urgentes.pop()  # Extrae del final (el más viejo)
