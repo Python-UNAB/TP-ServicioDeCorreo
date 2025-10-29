@@ -1,8 +1,8 @@
 # TP - Servidor de Correo
 
-Se realizaron las correcciones solicitadas en la ultima entrega con respecto a la lógica de recursividad de las carpetas y subcarpetas permitiendo las operaciones de busqueda y movimiento de mensajes.
-Se integró la librería de "pytest" para verificar el correcto funcionamiento del servidor.
-Se amplió el Abstract.md para mejorar la documentación del código, en caso de que aún debamos completar cosas por favor comentarlos en la devolución.
+- Se realizaron las correcciones solicitadas en la ultima entrega con respecto a la lógica de recursividad de las carpetas y subcarpetas permitiendo las operaciones de busqueda y movimiento de mensajes.
+- Se integró la librería de "pytest" para verificar el correcto funcionamiento del servidor.
+- Se amplió el Abstract.md para mejorar la documentación del código, en caso de que aún debamos completar cosas por favor comentarlos en la devolución.
 
 ## Objetivos
 
