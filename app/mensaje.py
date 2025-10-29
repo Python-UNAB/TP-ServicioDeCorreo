@@ -3,9 +3,9 @@ from datetime import datetime
 
 
 class Mensaje:
-	def __init__(self, remitente, destinatario, asunto: str, cuerpo: str):
+	def __init__(self, remitente, destinatario, asunto: str, cuerpo: str, *, urgente: bool = False):
 		"""Representa un mensaje entre usuarios del sistema.
-
+		
 		remitente: Usuario
 		destinatario: Usuario
 		"""
@@ -14,6 +14,7 @@ class Mensaje:
 		self.__asunto = asunto
 		self.__cuerpo = cuerpo
 		self.__fecha = datetime.now()
+		self.__urgente = urgente
 
 	@property
 	def mostrar_remitente(self):
@@ -27,6 +28,14 @@ class Mensaje:
 	@property
 	def mostrar_cuerpo(self):
 		return self.__cuerpo
+
+	@property
+	def fecha(self):
+		return self.__fecha
+
+	@property
+	def es_urgente(self):
+		return self.__urgente
 	
 	def mostrar_correo(self):
 		return (
@@ -37,4 +46,5 @@ class Mensaje:
 		)
 	
 	def mostrar_resumen(self):
-		return f"{self.__fecha.strftime('%Y-%m-%d %H:%M')} - {self.__asunto} (de {self.mostrar_remitente})"
+		prefijo = "[URGENTE] " if self.__urgente else ""
+		return f"{prefijo}{self.__fecha.strftime('%Y-%m-%d %H:%M')} - {self.__asunto} (de {self.mostrar_remitente})"
