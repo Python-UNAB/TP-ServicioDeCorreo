@@ -77,7 +77,6 @@ python -m app.main
 
 - Implementar menú con el Framework tkinter
 - Implementación del método de mostrar_resumen
-- Integración de Arboles
 
 ## Modalidad de trabajo:
 
