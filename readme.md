@@ -107,10 +107,7 @@ pytest -q
 
 ## Próximos pasos
 
-- Implementar interfaz gráfica con tkinter o web con Flask.
-- Persistencia en archivo JSON o base de datos SQLite.
-- Validaciones adicionales (formato de email, longitud de mensajes).
-- Notificaciones push o email real para nuevos mensajes.
+- Implementar interfaz gráfica con tkinter.
 
 ## Modalidad de trabajo:
 

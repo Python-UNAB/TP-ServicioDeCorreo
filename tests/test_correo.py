@@ -62,7 +62,7 @@ def test_cola_prioridad_urgentes():
 
 
 def test_mover_mensajes_sin_resultados():
-	usuario = Usuario("carol", "secret")
+	usuario = Usuario("Juan", "secret")
 	usuario.obtener_carpeta("Entrada")
 	usuario.obtener_o_crear_carpeta("Archivo")
 	with pytest.raises(LookupError):

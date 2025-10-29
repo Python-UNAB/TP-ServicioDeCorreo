@@ -11,7 +11,7 @@
 
 ### Estructura de árbol (recursividad)
 
-- **Gestión recursiva de carpetas**: cada `Carpeta` puede contener subcarpetas formando un árbol arbitrario.
+- **Gestión recursiva de carpetas**: cada `Carpeta` puede contener subcarpetas formando un árbol.
 - **Búsqueda y movimiento recursivos**: los métodos `buscar_mensajes` y `extraer_mensajes` recorren toda la jerarquía de subcarpetas para localizar y reubicar mensajes según criterios.
 - **Rutas con barra**: las carpetas se identifican con rutas tipo `Entrada/Proyectos/2025`, navegadas recursivamente al crear o acceder.
 
@@ -22,21 +22,21 @@
 
 ### Cola de mensajes urgentes (FIFO)
 
-- **Sin prioridad numérica**: se eliminó el concepto de prioridad numérica (0, 1, 2...).
 - **Cola simple FIFO**: mensajes urgentes se insertan al inicio de una lista; al extraer se toma del final (el más viejo primero), manteniendo orden de llegada.
 - **Visualización en menú de usuario**: opción dedicada para listar y atender todos los urgentes pendientes.
 
-### Correcciones aplicadas (segunda entrega)
+### Correcciones aplicadas (para las entregas)
 
 - **Modularización**: archivos separados por clase según recomendación del profesor.
-- **Abstract agregado**: este documento con objetivos, decisiones y alcance.
 - **Recursividad implementada**: búsqueda y movimiento funcionan en toda la jerarquía de carpetas.
 - **Tests unitarios**: 5 pruebas que validan recursividad, filtros, cola de urgentes y casos límite.
-- **Documentación de complejidad**: análisis Big-O de operaciones principales en README.
 - **Casos límite documentados**: carpetas inexistentes, búsquedas vacías, filtros sin destino.
 
 ## Alcance de esta entrega
 
-- Implementación en memoria sin persistencia.
+- Implementación de recursividad.
+- Implementación de estructura de Arboles.
+- Implementación de Test para verificar el correcto funcionamiento.
 - Funcionalidades de consola: registro, autenticación, envío, búsqueda, movimiento, filtros, urgentes.
-- Base lista para extender con validaciones, persistencia (JSON/SQLite) y UI gráfica (tkinter/Flask).
+- Implementación del método yield en carpeta para iterar sobre las carpetas del árbol.
+- Mejora de legibilidad del codigo implementando las importaciones de typing, esto permite la detección de errores

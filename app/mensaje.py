@@ -5,7 +5,7 @@ from datetime import datetime
 class Mensaje:
 	def __init__(self, remitente, destinatario, asunto: str, cuerpo: str, *, urgente: bool = False):
 		"""Representa un mensaje entre usuarios del sistema.
-
+		
 		remitente: Usuario
 		destinatario: Usuario
 		"""
