@@ -7,7 +7,36 @@
 - **ServidorCorreo** centraliza registro, autenticación y enrutamiento de mensajes entre usuarios.
 - **Usuario** posee carpetas predefinidas (Entrada, Enviados) para simplificar el flujo básico, y puede crear subcarpetas anidadas dinámicamente.
 - **Mensaje** es inmutable en sus metadatos luego de creado; solo se muestra o resume.
-- **Modularización por archivos**: cada clase en su módulo (`usuario.py`, `mensaje.py`, `carpeta.py`, `servidor.py`), más `app/main.py` como punto de entrada.
+- **Modularización completa**: el proyecto ha sido refactorizado a una arquitectura de capas en `src/` (models, algorithms, services, ui).
+
+### Refactorización Arquitectónica (Nueva Entrega)
+
+El sistema ha sido completamente reestructurado siguiendo principios de diseño modular:
+
+#### Capa de Modelos (`src/models/`)
+
+- Representación del dominio: Usuario, Mensaje, Carpeta, ServidorCorreo
+- Encapsulamiento completo con type hints
+- Inmutabilidad donde corresponde
+
+#### Capa de Algoritmos (`src/algorithms/`)
+
+- Búsqueda recursiva con análisis O(n)
+- Ordenamiento Timsort O(n log n)
+- Recorridos BFS/DFS para estructuras de carpetas
+- Documentación de complejidad en cada algoritmo
+
+#### Capa de Servicios (`src/services/`)
+
+- GestorMensajes: operaciones de alto nivel
+- GestorCarpetas: gestión de estructura jerárquica
+- GestorFiltros: factory de filtros automáticos
+- GestorRed: base para sistema distribuido (futuro)
+
+#### Capa de Presentación (`src/ui/`)
+
+- Separación CLI en MenuPrincipal y MenuUsuario
+- Preparado para reemplazo con GUI (tkinter)
 
 ### Estructura de árbol (recursividad)
 
@@ -19,13 +48,14 @@
 
 - **Filtros declarativos**: lista de reglas (diccionarios) que evalúan cada mensaje entrante.
 - **Enrutamiento automático**: al recibir un mensaje, se aplican los filtros del usuario; si uno coincide, el mensaje se mueve de Entrada a la carpeta destino configurada.
+- **Factory de filtros**: GestorFiltros proporciona creadores de filtros comunes (por asunto, remitente, urgencia)
 
-### Cola de mensajes urgentes (FIFO)
+### Cola de mensajes urgentes
 
-- **Cola simple FIFO**: mensajes urgentes se insertan al inicio de una lista; al extraer se toma del final (el más viejo primero), manteniendo orden de llegada.
-- **Visualización en menú de usuario**: opción dedicada para listar y atender todos los urgentes pendientes.
+- **Heap de prioridad**: mensajes urgentes se gestionan con heapq (O(log n))
+- **Ordenamiento por prioridad y tiempo**: prioridad 0 es la más alta, desempate por orden de llegada
 
-### Correcciones aplicadas (para las entregas)
+### Correcciones aplicadas (entregas anteriores)
 
 - **Modularización**: archivos separados por clase según recomendación del profesor.
 - **Recursividad implementada**: búsqueda y movimiento funcionan en toda la jerarquía de carpetas.
@@ -34,9 +64,25 @@
 
 ## Alcance de esta entrega
 
-- Implementación de recursividad.
-- Implementación de estructura de Arboles.
-- Implementación de Test para verificar el correcto funcionamiento.
-- Funcionalidades de consola: registro, autenticación, envío, búsqueda, movimiento, filtros, urgentes.
-- Implementación del método yield en carpeta para iterar sobre las carpetas del árbol.
-- Mejora de legibilidad del codigo implementando las importaciones de typing, esto permite la detección de errores
+### Funcionalidades Implementadas
+
+- ✅ Arquitectura modular en capas (src/)
+- ✅ Algoritmos documentados con análisis de complejidad
+- ✅ Servicios de alto nivel reutilizables
+- ✅ Recursividad en búsqueda y movimiento
+- ✅ Estructura de árbol de carpetas
+- ✅ Cola de prioridad para urgentes (heapq)
+- ✅ Filtros automáticos configurables
+- ✅ Tests unitarios con pytest
+- ✅ Documentación completa (README, MIGRACION, EJEMPLOS, ABSTRACT)
+
+### Preparado para Extensión
+
+- 🔄 Sistema de red de servidores (GestorRed con BFS)
+- 🔄 Interfaz lista para GUI
+- 🔄 Nuevos algoritmos fáciles de agregar
+
+### Ver también
+
+- [Guía de Migración](./MIGRACION.md) - Cómo migrar del código legacy
+- [Ejemplos de Uso](./EJEMPLOS.md) - Uso de nuevos módulos

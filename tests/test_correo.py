@@ -1,8 +1,8 @@
 import pytest
 
-from app.mensaje import Mensaje
-from app.servidor import ServidorCorreo
-from app.usuario import Usuario
+from src.models.mensaje import Mensaje
+from src.models.servidor_correo import ServidorCorreo
+from src.models.usuario import Usuario
 
 
 def test_busqueda_recursiva_mensajes():

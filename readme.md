@@ -1,9 +1,63 @@
 # TP - Servidor de Correo
 
+## Entregas Anteriores
+
 - Se realizaron las correcciones solicitadas en la ultima entrega con respecto a la lógica de recursividad de las carpetas y subcarpetas permitiendo las operaciones de busqueda y movimiento de mensajes.
 - Se integró la librería de "pytest" para verificar el correcto funcionamiento del servidor y hacer pruebas límites.
-- Se amplió el Abstract.md para mejorar la documentación del código, en caso de que aún debamos completar cosas por favor comentarlos en la devolución.
+- Se amplió el Abstract.md para mejorar la documentación del código.
 - Se investigáron buenas practicas y se utilizáron de la libreria de "typing" Callable, Dict, List, Optional para describir la forma de los datos y las funciones.
+
+## Nueva Entrega - Refactorización Arquitectónica
+
+El proyecto ha sido completamente reestructurado siguiendo principios de diseño modular y separación de responsabilidades:
+
+- **Modularización completa**: El código se organizó en una arquitectura de capas dentro de `src/`
+- **Separación de responsabilidades**: Models, Algorithms, Services y UI claramente diferenciados
+- **Algoritmos documentados**: Implementación de BFS/DFS, búsqueda recursiva y ordenamiento con análisis de complejidad
+- **Servicios de negocio**: Gestores especializados para mensajes, carpetas, filtros y preparación para red de servidores
+- **Mantenibilidad mejorada**: Código más limpio, testeable y extensible
+
+## Estructura del Proyecto
+
+```
+TP-ServicioDeCorreo/
+├── src/                        # Código fuente principal
+│   ├── models/                 # Clases del modelo de datos
+│   │   ├── __init__.py
+│   │   ├── usuario.py          # Clase Usuario
+│   │   ├── mensaje.py          # Clase Mensaje
+│   │   ├── carpeta.py          # Clase Carpeta (estructura de árbol)
+│   │   └── servidor_correo.py  # Clase ServidorCorreo
+│   │
+│   ├── algorithms/             # Algoritmos implementados
+│   │   ├── __init__.py
+│   │   ├── busqueda_recursiva.py   # Búsqueda recursiva en carpetas
+│   │   ├── ordenamiento.py         # Algoritmos de ordenamiento de mensajes
+│   │   └── recorrido_grafo.py      # BFS/DFS para recorrido de carpetas
+│   │
+│   ├── services/               # Lógica de negocio
+│   │   ├── __init__.py
+│   │   ├── gestor_mensajes.py  # Gestión de envío/recepción de mensajes
+│   │   ├── gestor_carpetas.py  # Operaciones sobre carpetas
+│   │   ├── gestor_filtros.py   # Aplicación de filtros automáticos
+│   │   └── gestor_red.py       # Gestión de red de servidores (futuro)
+│   │
+│   └── ui/                     # Interfaz de usuario
+│       ├── __init__.py
+│       ├── cli.py              # Interfaz de línea de comandos
+│       └── menu.py             # Sistema de menús
+│
+├── tests/                      # Pruebas unitarias
+│   └── test_correo.py
+│
+├── docs/                       # Documentación
+│   └── abstract.md
+│
+├── app/                        # Código legacy (deprecado, mantener para compatibilidad)
+├── main.py                     # Punto de entrada principal
+├── requirements.txt            # Dependencias del proyecto
+└── readme.md                   # Este archivo
+```
 
 ## Objetivos
 
@@ -106,11 +160,17 @@ classDiagram
 
 ## Cómo probar rápidamente
 
-Ejecuta el demo incluido:
+Ejecuta el sistema desde la raíz del proyecto:
 
-```powershell
-# Windows PowerShell
-python -m app.main
+```bash
+# Bash o PowerShell
+python main.py
+```
+
+O usando el módulo directamente:
+
+```bash
+python -m src.ui.cli
 ```
 
 ## Pruebas automáticas
@@ -124,7 +184,7 @@ pytest -q
 
 ## Manual de uso
 
-- Ejecutar el código con `python -m app.main` desde la raíz del proyecto.
+- Ejecutar el código con `python main.py` desde la raíz del proyecto.
 - Seleccionar alguna de las opciones listadas en el menú:
   - **Registrarse o ingresar** con usuario y contraseña.
   - **Enviar mensajes** a otros usuarios registrados, marcándolos como urgentes si es necesario.
@@ -134,10 +194,55 @@ pytest -q
   - **Configurar filtros** por asunto para organizar la bandeja automáticamente.
   - **Ver mensajes urgentes** pendientes desde el menú de usuario (se extraen en orden de llegada).
 
+## Arquitectura y Módulos
+
+### `src/models/` - Modelos de Datos
+
+Contiene las clases principales del dominio:
+
+- **Usuario**: Gestión de usuarios con carpetas y filtros
+- **Mensaje**: Representación inmutable de mensajes
+- **Carpeta**: Estructura recursiva de árbol para organización
+- **ServidorCorreo**: Coordinación central del sistema
+
+### `src/algorithms/` - Algoritmos Implementados
+
+Algoritmos con análisis de complejidad documentado:
+
+- **busqueda_recursiva.py**: Búsqueda en árbol de carpetas O(n)
+- **ordenamiento.py**: Ordenamiento por fecha, prioridad, remitente O(n log n)
+- **recorrido_grafo.py**: BFS/DFS para recorrido de estructuras
+
+### `src/services/` - Lógica de Negocio
+
+Capa de servicios con operaciones de alto nivel:
+
+- **GestorMensajes**: Envío, búsqueda y movimiento de mensajes
+- **GestorCarpetas**: Operaciones sobre estructura de carpetas
+- **GestorFiltros**: Configuración y aplicación de filtros
+- **GestorRed**: Base para comunicación entre servidores (futuro)
+
+### `src/ui/` - Interfaz de Usuario
+
+Sistema de menús modular:
+
+- **cli.py**: Punto de entrada de la interfaz CLI
+- **menu.py**: Implementación de MenuPrincipal y MenuUsuario
+
 ## Próximos pasos
 
 - Implementar interfaz gráfica con tkinter.
 
-## Modalidad de trabajo:
+## Documentación Completa
+
+📚 Ver [Índice de Documentación](./docs/INDICE.md) para acceso a todos los documentos:
+
+- **abstract.md**: Decisiones de diseño y arquitectura
+- **MIGRACION.md**: Guía de migración de código legacy
+- **EJEMPLOS.md**: Ejemplos prácticos de uso
+- **CONFIGURACION.md**: Setup del entorno de desarrollo
+- **RESUMEN_REFACTORIZACION.md**: Resumen completo de cambios
+
+## Modalidad de trabajo
 
 - Se colaboró en conjunto, y se trabajó con LiveShare permitiendo un desarrollo coordinado.
