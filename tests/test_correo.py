@@ -62,11 +62,11 @@ def test_cola_prioridad_urgentes():
 
 def test_heap_prioridad_menor_sale_antes():
 	servidor = ServidorCorreo()
-	servidor.registrar_usuario("Ana", "secret")
+	servidor.registrar_usuario("Juan", "secret")
 	servidor.registrar_usuario("Bruno", "secret")
-	m_baja = servidor.enviar_mensaje("Ana", "Bruno", "Info", "Normal", prioridad=5)
-	m_alta = servidor.enviar_mensaje("Ana", "Bruno", "Alerta", "Importante", prioridad=1)
-	m_media = servidor.enviar_mensaje("Ana", "Bruno", "Recordatorio", "Pendiente", prioridad=3)
+	m_baja = servidor.enviar_mensaje("Juan", "Bruno", "Info", "Normal", prioridad=5)
+	m_alta = servidor.enviar_mensaje("Juan", "Bruno", "Alerta", "Importante", prioridad=1)
+	m_media = servidor.enviar_mensaje("Juan", "Bruno", "Recordatorio", "Pendiente", prioridad=3)
 	assert servidor.tiene_mensajes_urgentes() is True
 	assert servidor.extraer_mensaje_urgente() is m_alta
 	assert servidor.extraer_mensaje_urgente() is m_media
@@ -84,9 +84,9 @@ def test_mover_mensajes_sin_resultados():
 
 def test_prioridad_fuera_de_rango():
 	servidor = ServidorCorreo()
-	servidor.registrar_usuario("Ana", "secret")
+	servidor.registrar_usuario("Juan", "secret")
 	servidor.registrar_usuario("Bruno", "secret")
 	with pytest.raises(ValueError):
-		servidor.enviar_mensaje("Ana", "Bruno", "Prueba", "Contenido", prioridad=0)
+		servidor.enviar_mensaje("Juan", "Bruno", "Prueba", "Contenido", prioridad=0)
 	with pytest.raises(ValueError):
-		servidor.enviar_mensaje("Ana", "Bruno", "Prueba", "Contenido", prioridad=6)
+		servidor.enviar_mensaje("Juan", "Bruno", "Prueba", "Contenido", prioridad=6)
