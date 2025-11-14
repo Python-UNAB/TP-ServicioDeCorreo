@@ -157,3 +157,9 @@ pytest -q
 ## Modalidad de trabajo:
 
 - Se colaboró en conjunto, y se trabajó con LiveShare permitiendo un desarrollo coordinado.
+
+## Grupo 7
+
+- Miguel Miguez
+- Rodrigo Podoba
+- Juan Rubio
