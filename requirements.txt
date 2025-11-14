@@ -1,0 +1,12 @@
+# Dependencias externas
+# ====================
+# Dependencias para testing
+pytest>=7.4.0
+
+# Dependencias nativas de Python (incluidas en la instalación estándar)
+# ======================================================================
+# typing - Anotaciones de tipos (Callable, Dict, List, Optional, Tuple, Iterable)
+# datetime - Manejo de fechas y horas (datetime.now, strftime)
+# heapq - Implementación de cola de prioridad (heappush, heappop)
+# itertools - Herramientas de iteración (count)
+# __future__ - Anotaciones futuras (annotations)

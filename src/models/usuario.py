@@ -1,6 +1,8 @@
+from collections import deque
 from typing import Callable, Dict, List, Optional
 
 from .carpeta import Carpeta
+from .filtro import Filtro
 
 
 class Usuario:
@@ -9,7 +11,7 @@ class Usuario:
 		self.__username = username
 		self.__password = password
 		self.__carpetas: Dict[str, Carpeta] = {}
-		self.__filtros: List[Dict[str, object]] = []
+		self.__filtros: List[Filtro] = []
 		for nombre in ("Entrada", "Enviados"):
 			self.__carpetas[nombre] = Carpeta(nombre)
 
@@ -31,7 +33,6 @@ class Usuario:
 			carpeta = self.__carpetas.setdefault(partes[0], Carpeta(partes[0]))
 		elif carpeta is None:
 			return None
-		# Navegar recursivamente por subcarpetas
 		for nombre in partes[1:]:
 			siguiente = carpeta.obtener_subcarpeta(nombre)
 			if siguiente is None:
@@ -50,16 +51,33 @@ class Usuario:
 			raise ValueError("La ruta de carpeta no puede estar vacía")
 		return carpeta
 
-	def listar_carpetas(self) -> List[str]:
+	def listar_carpetas(self, orden: str = "dfs") -> List[str]:
+		"""Devuelve las rutas de carpetas usando recorrido DFS (default) o BFS."""
 		rutas = []
 		for nombre, carpeta in sorted(self.__carpetas.items()):
-			rutas.extend(self.__listar_recursivo(carpeta, nombre))
+			if orden == "dfs":
+				rutas.extend(self.__listar_recursivo(carpeta, nombre))
+			elif orden == "bfs":
+				rutas.extend(self.__listar_bfs(carpeta, nombre))
+			else:
+				raise ValueError("Orden de recorrido no soportado, use 'dfs' o 'bfs'")
 		return rutas
 
 	def __listar_recursivo(self, carpeta: Carpeta, prefijo: str) -> List[str]:
 		rutas = [prefijo]
 		for nombre, subcarpeta in sorted(carpeta.listar_subcarpetas().items()):
 			rutas.extend(self.__listar_recursivo(subcarpeta, f"{prefijo}/{nombre}"))
+		return rutas
+
+	def __listar_bfs(self, carpeta: Carpeta, prefijo: str) -> List[str]:
+		cola = deque([(carpeta, prefijo)])
+		rutas = []
+		while cola:
+			actual, ruta = cola.popleft()
+			rutas.append(ruta)
+			subcarpetas = sorted(actual.listar_subcarpetas().items())
+			for nombre, subcarpeta in subcarpetas:
+				cola.append((subcarpeta, f"{ruta}/{nombre}"))
 		return rutas
 
 	def buscar_mensajes(self, criterio: Callable, carpeta_ruta: Optional[str] = None):
@@ -69,7 +87,6 @@ class Usuario:
 			if carpeta is None:
 				return []
 			return carpeta.buscar_mensajes(criterio)
-		# Buscar en todas las carpetas raíz
 		resultados = []
 		for carpeta in self.__carpetas.values():
 			resultados.extend(carpeta.buscar_mensajes(criterio))
@@ -80,7 +97,6 @@ class Usuario:
 		destino = self._navegar_ruta(destino_ruta, crear=crear_destino)
 		if destino is None:
 			raise ValueError("La carpeta destino no existe")
-		# Determinar carpetas de origen
 		fuentes = []
 		if origen_ruta:
 			carpeta_origen = self.obtener_carpeta(origen_ruta)
@@ -89,7 +105,6 @@ class Usuario:
 			fuentes.append(carpeta_origen)
 		else:
 			fuentes = list(self.__carpetas.values())
-		# Extraer y mover mensajes
 		movidos = 0
 		for carpeta in fuentes:
 			extraidos = carpeta.extraer_mensajes(criterio)
@@ -101,17 +116,12 @@ class Usuario:
 		return movidos
 
 	def agregar_filtro(self, nombre: str, condicion: Callable, destino_ruta: str, *, crear_destino: bool = True):
-		if any(filtro["nombre"] == nombre for filtro in self.__filtros):
+		if any(filtro.nombre == nombre for filtro in self.__filtros):
 			raise ValueError(f"Ya existe un filtro con el nombre {nombre}")
-		self.__filtros.append({
-			"nombre": nombre,
-			"condicion": condicion,
-			"destino": destino_ruta,
-			"crear_destino": crear_destino,
-		})
+		self.__filtros.append(Filtro(nombre, condicion, destino_ruta, crear_destino=crear_destino))
 
 	def listar_filtros(self) -> List[str]:
-		return [filtro["nombre"] for filtro in self.__filtros]
+		return [filtro.nombre for filtro in self.__filtros]
 
 	def aplicar_filtros(self, mensaje) -> Optional[str]:
 		"""Aplica filtros automáticos al mensaje recibido, moviéndolo si coincide con algún criterio."""
@@ -119,13 +129,11 @@ class Usuario:
 		if entrada is None:
 			return None
 		for filtro in self.__filtros:
-			condicion = filtro["condicion"]
-			if condicion(mensaje):
-				destino = self._navegar_ruta(filtro["destino"], crear=filtro.get("crear_destino", False))
+			if filtro.aplica_a(mensaje):
+				destino = self._navegar_ruta(filtro.destino_ruta, crear=filtro.crear_destino)
 				if destino is None:
 					continue
-				# Mover mensaje de Entrada a la carpeta destino del filtro
 				if entrada.eliminar_mensaje(mensaje):
 					destino.agregar_mensaje(mensaje)
-					return filtro["nombre"]
+					return filtro.nombre
 		return None

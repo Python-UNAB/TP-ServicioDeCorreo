@@ -19,7 +19,13 @@
 - **Búsqueda recursiva**: la búsqueda recorre todas las carpetas y subcarpetas de forma recursiva. En el peor caso es `O(n)` donde `n` es la cantidad total de mensajes almacenados en todo el árbol de carpetas.
 - **Movimiento de mensajes**: la extracción y reubicación también recorre recursivamente, con complejidad `O(n)` en el peor caso si se visita cada carpeta del árbol.
 - **Aplicación de filtros**: por cada mensaje recibido se evalúan las reglas configuradas (`O(r)` donde `r` es la cantidad de filtros del usuario). La evaluación se detiene cuando un filtro coincide.
-- **Cola de urgentes (FIFO)**: las inserciones al inicio y extracciones al final de la lista son `O(1)` amortizado. No se usa prioridad numérica; el orden es por llegada (primero en llegar, primero en salir).
+- **Cola de urgentes (heap)**: las inserciones se realizan con `heapq` en `O(log n)` y las extracciones priorizan el menor valor (rango permitido 1-5), usando un contador para mantener el orden de llegada en empates.
+
+## Algoritmos reutilizables
+
+- `src/algorithms/busqueda_recursiva.py`: funciones puras para localizar y extraer mensajes recorriendo el árbol.
+- `src/algorithms/ordenamiento.py`: estrategias de ordenamiento por fecha o prioridad aplicables a cualquier lista de mensajes.
+- `src/algorithms/recorrido_grafo.py`: generadores DFS/BFS para iterar la jerarquía de carpetas.
 
 ## Casos límite considerados
 
@@ -36,11 +42,11 @@ classDiagram
 
     class ServidorCorreo {
         -__usuarios: Dict~str, Usuario~
-        -__cola_urgentes: List~Mensaje~
+        -__cola_urgentes: List~Tuple~int, int, Mensaje~~
         +registrar_usuario(username, password)
         +autenticar(username, password) Usuario
         +obtener_usuario(username) Usuario
-        +enviar_mensaje(remitente, destinatario, asunto, cuerpo, urgente)
+        +enviar_mensaje(remitente, destinatario, asunto, cuerpo, urgente, prioridad)
         +tiene_mensajes_urgentes() bool
         +extraer_mensaje_urgente() Mensaje
     }
@@ -49,17 +55,28 @@ classDiagram
         -__username: str
         -__password: str
         -__carpetas: Dict~str, Carpeta~
-        -__filtros: List~Dict~
+        -__filtros: List~Filtro~
         +username: str
         +password: str
         +obtener_carpeta(ruta) Carpeta
         +obtener_o_crear_carpeta(ruta) Carpeta
-        +listar_carpetas() List~str~
+        +listar_carpetas(orden='dfs') List~str~
         +buscar_mensajes(criterio, carpeta_ruta)
         +mover_mensajes(criterio, destino_ruta, origen_ruta) int
         +agregar_filtro(nombre, condicion, destino_ruta)
         +listar_filtros() List~str~
         +aplicar_filtros(mensaje) str
+    }
+
+    class Filtro {
+        -__nombre: str
+        -__condicion: Callable
+        -__destino_ruta: str
+        -__crear_destino: bool
+        +nombre: str
+        +destino_ruta: str
+        +crear_destino: bool
+        +aplica_a(mensaje) bool
     }
 
     class Carpeta {
@@ -86,18 +103,21 @@ classDiagram
         -__cuerpo: str
         -__fecha: datetime
         -__urgente: bool
+        -__prioridad: Optional~int~
         +mostrar_remitente: str
         +mostrar_destinatario: str
         +mostrar_asunto: str
         +mostrar_cuerpo: str
         +fecha: datetime
         +es_urgente: bool
+        +prioridad: Optional~int~
         +mostrar_correo() str
         +mostrar_resumen() str
     }
 
     ServidorCorreo "1" o-- "*" Usuario : gestiona
     Usuario "1" o-- "*" Carpeta : contiene
+    Usuario "1" o-- "*" Filtro : aplica
     Carpeta "1" o-- "*" Mensaje : almacena
     Carpeta "1" o-- "*" Carpeta : subcarpetas
     Mensaje "*" --> "1" Usuario : remitente
@@ -110,7 +130,7 @@ Ejecuta el demo incluido:
 
 ```powershell
 # Windows PowerShell
-python -m app.main
+python -m src.ui.main
 ```
 
 ## Pruebas automáticas
@@ -124,19 +144,15 @@ pytest -q
 
 ## Manual de uso
 
-- Ejecutar el código con `python -m app.main` desde la raíz del proyecto.
+- Ejecutar el código con `python -m src.ui.main` desde la raíz del proyecto.
 - Seleccionar alguna de las opciones listadas en el menú:
   - **Registrarse o ingresar** con usuario y contraseña.
-  - **Enviar mensajes** a otros usuarios registrados, marcándolos como urgentes si es necesario.
-  - **Ver mensajes** de Entrada o Enviados, seleccionando un mensaje para leer el contenido completo.
+    - **Enviar mensajes** asignando prioridad numérica del 1 al 5 (1 = más urgente) cuando sea necesario.
+    - **Ver mensajes** de cualquier carpeta listada, seleccionándola por número y luego el mensaje deseado.
   - **Crear subcarpetas** anidadas (ejemplo: `Entrada/Proyectos/2025`).
   - **Buscar y mover mensajes** por texto en asunto o cuerpo, de forma recursiva en toda la jerarquía.
   - **Configurar filtros** por asunto para organizar la bandeja automáticamente.
-  - **Ver mensajes urgentes** pendientes desde el menú de usuario (se extraen en orden de llegada).
-
-## Próximos pasos
-
-- Implementar interfaz gráfica con tkinter.
+    - **Ver mensajes urgentes** pendientes desde el menú de usuario (se extraen respetando prioridad y orden de llegada).
 
 ## Modalidad de trabajo:
 

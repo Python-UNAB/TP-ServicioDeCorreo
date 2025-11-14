@@ -1,0 +1,126 @@
+MANUAL DE USUARIO - SERVIDOR DE CORREO
+======================================
+
+1. Requisitos previos
+---------------------
+- Contar con Python 3.10 o superior instalado.
+- Instalar las dependencias del proyecto:
+  - Abrir una terminal en la raíz del repositorio.
+  - Ejecutar: `pip install -r requirements.txt`
+
+2. Iniciar la aplicación
+------------------------
+- Desde la terminal, ubicarse en la raíz del proyecto.
+- Ejecutar: `python -m src.ui.main`
+- Se mostrará el menú principal del servidor con tres opciones:
+  1. Ingresar
+  2. Registrarse
+  3. Salir
+
+3. Registrarse
+--------------
+- Seleccionar la opción 2 del menú principal.
+- Ingresar un nombre de usuario y una contraseña.
+- Si el usuario no existía, se informará "registrado con éxito".
+- El usuario queda listo para autenticarse y usar el servicio.
+
+4. Ingresar
+-----------
+- Seleccionar la opción 1 del menú principal.
+- Introducir usuario y contraseña.
+- Si las credenciales son válidas, se accede al menú de usuario.
+- En caso contrario, se informa el error y se regresa al menú principal.
+
+5. Menú de usuario
+------------------
+Al autenticarse, se muestra:
+
+1. Enviar mensaje
+2. Ver mensajes de Entrada
+3. Ver mensajes de Enviados
+4. Mover mensajes
+5. Crear carpeta
+6. Ver carpetas
+7. Agregar filtro por asunto
+8. Listar filtros activos
+9. Ver mensajes urgentes
+10. Cerrar sesión
+
+Descripción de cada opción:
+
+5.1 Enviar mensaje
+~~~~~~~~~~~~~~~~~~
+- Solicita destinatario, asunto, cuerpo y prioridad (1 a 5, 1 = más urgente).
+- Si se deja la prioridad en blanco, el mensaje se registra como normal.
+- Mensajes urgentes (prioridad cargada) quedan disponibles en la cola especial.
+
+5.2 Ver mensajes de Entrada
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Lista todos los mensajes recibidos ordenados por prioridad y fecha.
+- Permite seleccionar un mensaje para mostrar su contenido completo.
+
+5.3 Ver mensajes de Enviados
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Lista los mensajes enviados por el usuario actual con el mismo criterio de orden.
+- Permite revisar el cuerpo completo de cada mensaje.
+
+5.4 Mover mensajes
+~~~~~~~~~~~~~~~~~~
+- Permite buscar mensajes por texto (en asunto o cuerpo) para moverlos hacia otra carpeta.
+- Se puede especificar carpeta de origen (opcional), destino y si debe crearse automáticamente.
+- Informa cuántos mensajes fueron movidos. Si no encuentra coincidencias, lanza un error.
+
+5.5 Crear carpeta
+~~~~~~~~~~~~~~~~~
+- Crea subcarpetas arbitrarias usando rutas con barras (Ej: `Entrada/Proyectos/2025`).
+- Si la ruta ya existe, simplemente se informa que está disponible.
+
+5.6 Ver carpetas
+~~~~~~~~~~~~~~~~
+- Muestra todas las carpetas disponibles numeradas.
+- Permite seleccionar una carpeta y listar los mensajes que contiene, con opción de abrir cada mensaje.
+
+5.7 Agregar filtro por asunto
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Permite configurar reglas que se aplican automáticamente a los mensajes entrantes.
+- Se solicita nombre del filtro, palabra clave en el asunto, carpeta destino y si debe crearse automáticamente.
+- Los mensajes que coincidan se moverán a la carpeta destino al momento de recibirlos.
+
+5.8 Listar filtros activos
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Muestra los nombres de todos los filtros configurados por el usuario.
+
+5.9 Ver mensajes urgentes
+~~~~~~~~~~~~~~~~~~~~~~~~~
+- Extrae mensajes de la cola de urgentes en orden de prioridad (1 a 5) y orden de llegada.
+- Cada mensaje se muestra en pantalla y se elimina de la cola una vez procesado.
+
+5.10 Cerrar sesión
+~~~~~~~~~~~~~~~~~~
+- Finaliza la sesión del usuario actual y regresa al menú principal.
+
+6. Organización de carpetas
+---------------------------
+- Cada usuario cuenta con carpetas iniciales "Entrada" y "Enviados".
+- Se pueden crear subcarpetas anidadas sin límite de profundidad.
+- Las operaciones de búsqueda y movimiento recorren recursivamente toda la estructura.
+
+7. Filtros automáticos
+----------------------
+- Los filtros se almacenan con nombre, condición y carpeta destino.
+- Al recibir un mensaje, se evalúan en orden y el primero que coincide lo mueve a su carpeta.
+- Las carpetas destino pueden crearse automáticamente si el filtro así lo indica.
+
+8. Cola de urgentes
+-------------------
+- Los mensajes con prioridad (1-5) ingresan a un heap que garantiza que los más urgentes salgan primero.
+- Si dos mensajes tienen la misma prioridad, se respeta el orden de llegada (FIFO por nivel).
+
+9. Ejecución de pruebas
+-----------------------
+- Para validar el sistema rápidamente, ejecutar en la raíz: `pytest -q`
+- Las pruebas cubren búsqueda recursiva, movimiento, filtros, cola de urgentes y límites.
+
+10. Cierre
+----------
+Este manual resume el flujo completo del servidor de correo.

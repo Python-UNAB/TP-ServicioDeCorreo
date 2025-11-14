@@ -1,3 +1,10 @@
+from ..algorithms.busqueda_recursiva import (
+    buscar_mensajes_en_carpeta,
+    extraer_mensajes_en_carpeta,
+)
+from ..algorithms.recorrido_grafo import bfs_carpeta, dfs_carpeta
+
+
 class Carpeta:
     """Representa una carpeta que puede contener mensajes y subcarpetas."""
 
@@ -39,28 +46,19 @@ class Carpeta:
 
     def buscar_mensajes(self, criterio):
         """Busca recursivamente mensajes que cumplen el criterio en esta carpeta y todas sus subcarpetas."""
-        encontrados = [m for m in self.__mensajes if criterio(m)]
-        # Recursión: buscar en cada subcarpeta
-        for subcarpeta in self.__subcarpetas.values():
-            encontrados.extend(subcarpeta.buscar_mensajes(criterio))
-        return encontrados
+        return buscar_mensajes_en_carpeta(self, criterio)
 
     def extraer_mensajes(self, criterio):
         """Extrae recursivamente mensajes que cumplen el criterio, eliminándolos de esta carpeta y subcarpetas."""
-        retenidos = []
-        extraidos = []
-        for mensaje in self.__mensajes:
-            if criterio(mensaje):
-                extraidos.append(mensaje)
-            else:
-                retenidos.append(mensaje)
-        self.__mensajes = retenidos
-        # Recursión: extraer también de subcarpetas
-        for subcarpeta in self.__subcarpetas.values():
-            extraidos.extend(subcarpeta.extraer_mensajes(criterio))
-        return extraidos
+        return extraer_mensajes_en_carpeta(self, criterio)
 
     def recorrer(self):
-        yield self
-        for subcarpeta in self.__subcarpetas.values():
-            yield from subcarpeta.recorrer()
+        yield from self.recorrer_dfs()
+
+    def recorrer_dfs(self):
+        """Recorre la jerarquía en profundidad (DFS)."""
+        yield from dfs_carpeta(self)
+
+    def recorrer_bfs(self):
+        """Recorre la jerarquía en amplitud (BFS)."""
+        yield from bfs_carpeta(self)

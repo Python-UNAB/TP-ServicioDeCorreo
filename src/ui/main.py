@@ -1,4 +1,5 @@
-from .servidor import ServidorCorreo
+from ..algorithms.ordenamiento import ordenar_mensajes_por_prioridad
+from ..services.servidor import ServidorCorreo
 
 
 def menu_usuario(servidor: ServidorCorreo, usuario):
@@ -20,15 +21,25 @@ def menu_usuario(servidor: ServidorCorreo, usuario):
             destinatario = input("Destinatario (username): ").strip()
             asunto = input("Asunto: ").strip()
             cuerpo = input("Contenido: ").strip()
-            urgente_input = input("¿Marcar como urgente? (s/n): ").strip().lower()
-            urgente = urgente_input in {"s", "si", "y"}
+            prioridad_input = input("Prioridad (1-5, 1 = más urgente, Enter para normal): ").strip()
+            prioridad = None
+            if prioridad_input:
+                try:
+                    prioridad = int(prioridad_input)
+                except ValueError:
+                    print("La prioridad debe ser un número entero entre 1 y 5.\n")
+                    continue
+                if not 1 <= prioridad <= 5:
+                    print("La prioridad debe estar entre 1 y 5.\n")
+                    continue
             try:
-                servidor.enviar_mensaje(usuario.username, destinatario, asunto, cuerpo, urgente=urgente)
+                servidor.enviar_mensaje(usuario.username, destinatario, asunto, cuerpo, prioridad=prioridad)
                 print("Mensaje enviado.\n")
             except ValueError as e:
                 print(f"Error: {e}\n")
         elif op == "2":
-            mensajes = usuario.obtener_carpeta("Entrada").listar_mensajes()
+            carpeta = usuario.obtener_carpeta("Entrada")
+            mensajes = ordenar_mensajes_por_prioridad(carpeta.listar_mensajes(), descendente_fecha=True)
             if not mensajes:
                 print("Entrada vacía.\n")
                 continue
@@ -48,7 +59,8 @@ def menu_usuario(servidor: ServidorCorreo, usuario):
             else:
                 print("Índice fuera de rango.\n")
         elif op == "3":
-            mensajes = usuario.obtener_carpeta("Enviados").listar_mensajes()
+            carpeta = usuario.obtener_carpeta("Enviados")
+            mensajes = ordenar_mensajes_por_prioridad(carpeta.listar_mensajes(), descendente_fecha=True)
             if not mensajes:
                 print("Enviados vacío.\n")
                 continue
@@ -76,7 +88,12 @@ def menu_usuario(servidor: ServidorCorreo, usuario):
             origen = input("Carpeta origen (Enter para buscar en todas): ").strip() or None
             crear_dest = input("¿Crear carpeta destino si no existe? (s/n): ").strip().lower() in {"s", "si", "y"}
             try:
-                movidos = usuario.mover_mensajes(lambda mensaje: texto in mensaje.mostrar_asunto.lower() or texto in mensaje.mostrar_cuerpo.lower(), destino, origen_ruta=origen, crear_destino=crear_dest)
+                movidos = usuario.mover_mensajes(
+                    lambda mensaje: texto in mensaje.mostrar_asunto.lower() or texto in mensaje.mostrar_cuerpo.lower(),
+                    destino,
+                    origen_ruta=origen,
+                    crear_destino=crear_dest,
+                )
                 print(f"Se movieron {movidos} mensajes.\n")
             except (ValueError, LookupError) as e:
                 print(f"Error: {e}\n")
@@ -94,11 +111,46 @@ def menu_usuario(servidor: ServidorCorreo, usuario):
             carpetas = usuario.listar_carpetas()
             if not carpetas:
                 print("No hay carpetas disponibles.\n")
-            else:
-                print("\n--- CARPETAS DISPONIBLES ---")
-                for carpeta in carpetas:
-                    print(f"  • {carpeta}")
+                continue
+            print("\n--- CARPETAS DISPONIBLES ---")
+            for idx, carpeta_ruta in enumerate(carpetas, 1):
+                print(f"{idx}. {carpeta_ruta}")
+            print()
+            try:
+                seleccion = int(input("Seleccioná número de carpeta (0 para volver): ").strip() or "0")
+            except ValueError:
+                print("Entrada inválida.\n")
+                continue
+            if seleccion == 0:
+                continue
+            if not 1 <= seleccion <= len(carpetas):
+                print("Índice fuera de rango.\n")
+                continue
+            ruta = carpetas[seleccion - 1]
+            carpeta = usuario.obtener_carpeta(ruta)
+            if carpeta is None:
+                print("La carpeta no existe.\n")
+                continue
+            mensajes = ordenar_mensajes_por_prioridad(carpeta.listar_mensajes(), descendente_fecha=True)
+            if not mensajes:
+                print("No hay mensajes en esta carpeta.\n")
+                continue
+            print(f"\n--- MENSAJES EN {ruta} ---")
+            for i, mensaje in enumerate(mensajes, 1):
+                print(f"{i}. {mensaje.mostrar_resumen()}")
+            try:
+                idx = int(input("Seleccioná número de mensaje (0 para volver): ").strip() or "0")
+            except ValueError:
+                print("Entrada inválida.\n")
+                continue
+            if idx == 0:
+                continue
+            if 1 <= idx <= len(mensajes):
+                print("\n--- MENSAJE ---")
+                print(mensajes[idx - 1].mostrar_correo())
                 print()
+            else:
+                print("Índice fuera de rango.\n")
         elif op == "7":
             nombre = input("Nombre del filtro: ").strip()
             palabra = input("Palabra clave en el asunto: ").strip().lower()
@@ -108,7 +160,12 @@ def menu_usuario(servidor: ServidorCorreo, usuario):
                 print("Todos los campos son obligatorios.\n")
                 continue
             try:
-                usuario.agregar_filtro(nombre, lambda mensaje, palabra=palabra: palabra in mensaje.mostrar_asunto.lower(), destino, crear_destino=crear_dest)
+                usuario.agregar_filtro(
+                    nombre,
+                    lambda mensaje, palabra=palabra: palabra in mensaje.mostrar_asunto.lower(),
+                    destino,
+                    crear_destino=crear_dest,
+                )
                 print("Filtro agregado.\n")
             except ValueError as e:
                 print(f"Error: {e}\n")

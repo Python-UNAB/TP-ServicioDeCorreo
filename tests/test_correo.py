@@ -1,8 +1,7 @@
 import pytest
 
-from app.mensaje import Mensaje
-from app.servidor import ServidorCorreo
-from app.usuario import Usuario
+from src.models import Mensaje, Usuario
+from src.services import ServidorCorreo
 
 
 def test_busqueda_recursiva_mensajes():
@@ -51,7 +50,7 @@ def test_cola_prioridad_urgentes():
 	m2 = servidor.enviar_mensaje("Miguel", "Rodrigo", "Mensaje 2", "Contenido 2", urgente=True)
 	m3 = servidor.enviar_mensaje("Miguel", "Rodrigo", "Mensaje 3", "Contenido 3", urgente=True)
 	assert servidor.tiene_mensajes_urgentes() is True
-	# La cola extrae del más viejo al más reciente (FIFO)
+	# Para igual prioridad se respeta el orden de llegada (FIFO dentro de cada nivel)
 	primero = servidor.extraer_mensaje_urgente()
 	segundo = servidor.extraer_mensaje_urgente()
 	tercero = servidor.extraer_mensaje_urgente()
@@ -61,9 +60,33 @@ def test_cola_prioridad_urgentes():
 	assert servidor.extraer_mensaje_urgente() is None
 
 
+def test_heap_prioridad_menor_sale_antes():
+	servidor = ServidorCorreo()
+	servidor.registrar_usuario("Ana", "secret")
+	servidor.registrar_usuario("Bruno", "secret")
+	m_baja = servidor.enviar_mensaje("Ana", "Bruno", "Info", "Normal", prioridad=5)
+	m_alta = servidor.enviar_mensaje("Ana", "Bruno", "Alerta", "Importante", prioridad=1)
+	m_media = servidor.enviar_mensaje("Ana", "Bruno", "Recordatorio", "Pendiente", prioridad=3)
+	assert servidor.tiene_mensajes_urgentes() is True
+	assert servidor.extraer_mensaje_urgente() is m_alta
+	assert servidor.extraer_mensaje_urgente() is m_media
+	assert servidor.extraer_mensaje_urgente() is m_baja
+	assert servidor.extraer_mensaje_urgente() is None
+
+
 def test_mover_mensajes_sin_resultados():
 	usuario = Usuario("Juan", "secret")
 	usuario.obtener_carpeta("Entrada")
 	usuario.obtener_o_crear_carpeta("Archivo")
 	with pytest.raises(LookupError):
 		usuario.mover_mensajes(lambda m: "inexistente" in m.mostrar_asunto.lower(), "Archivo")
+
+
+def test_prioridad_fuera_de_rango():
+	servidor = ServidorCorreo()
+	servidor.registrar_usuario("Ana", "secret")
+	servidor.registrar_usuario("Bruno", "secret")
+	with pytest.raises(ValueError):
+		servidor.enviar_mensaje("Ana", "Bruno", "Prueba", "Contenido", prioridad=0)
+	with pytest.raises(ValueError):
+		servidor.enviar_mensaje("Ana", "Bruno", "Prueba", "Contenido", prioridad=6)
