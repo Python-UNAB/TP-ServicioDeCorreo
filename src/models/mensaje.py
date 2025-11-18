@@ -9,6 +9,7 @@ class Mensaje:
 
 		remitente: Usuario
 		destinatario: Usuario
+		prioridad: int entre 1 (más alta) y 5 (más baja) o None
 		"""
 		self.__remitente = remitente
 		self.__destinatario = destinatario
@@ -16,7 +17,7 @@ class Mensaje:
 		self.__cuerpo = cuerpo
 		self.__fecha = datetime.now()
 		self.__prioridad = self._resolver_prioridad(prioridad, urgente)
-		self.__urgente = self.__prioridad is not None
+		self.__urgente = self.__prioridad is not None 
 
 	def _resolver_prioridad(self, prioridad: Optional[int], urgente: bool) -> Optional[int]:
 		if prioridad is not None:

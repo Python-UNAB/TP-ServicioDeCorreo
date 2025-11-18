@@ -9,7 +9,7 @@
 - **Mensaje** es inmutable en sus metadatos luego de creado; solo se muestra o resume.
 - **Mensaje** incorpora prioridad opcional (rango 1-5) para integrarse con la cola de urgentes basada en heap.
 - **Algorithms** reúne utilidades puras para búsqueda recursiva, recorridos (DFS/BFS) y ordenamiento de mensajes.
-- **Modularización por archivos**: cada clase en su módulo (`usuario.py`, `mensaje.py`, `carpeta.py`, `servidor.py`), más `app/main.py` como punto de entrada.
+- **Modularización por archivos**: cada clase en su módulo (`usuario.py`, `mensaje.py`, `carpeta.py`, `servidor.py` ).
 
 ### Estructura de árbol (recursividad)
 

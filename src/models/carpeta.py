@@ -1,3 +1,5 @@
+from typing import List, Dict
+from mailbox import Message
 from ..algorithms.busqueda_recursiva import (
     buscar_mensajes_en_carpeta,
     extraer_mensajes_en_carpeta,
@@ -10,8 +12,8 @@ class Carpeta:
 
     def __init__(self, nombre_carpeta):
         self.__nombre_carpeta = nombre_carpeta
-        self.__mensajes = []  # Lista de Mensajes
-        self.__subcarpetas = {}  # nombre -> Carpeta
+        self.__mensajes: List[Message] = []
+        self.__subcarpetas: Dict[str, Carpeta] = {}  # nombre -> Carpeta
 
     @property
     def nombre(self):
@@ -33,7 +35,7 @@ class Carpeta:
         except ValueError:
             return False
 
-    def crear_subcarpeta(self, nombre):
+    def crear_subcarpeta(self, nombre: str) -> Carpeta:
         if nombre not in self.__subcarpetas:
             self.__subcarpetas[nombre] = Carpeta(nombre)
         return self.__subcarpetas[nombre]
