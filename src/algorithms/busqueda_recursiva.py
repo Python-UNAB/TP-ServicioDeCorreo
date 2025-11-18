@@ -16,6 +16,7 @@ def buscar_mensajes_en_carpeta(carpeta: "Carpeta", criterio: FiltroMensaje) -> L
 	for subcarpeta in carpeta.listar_subcarpetas().values():
 		resultado.extend(buscar_mensajes_en_carpeta(subcarpeta, criterio))
 	return resultado
+	
 
 
 def extraer_mensajes_en_carpeta(carpeta: "Carpeta", criterio: FiltroMensaje) -> List["Mensaje"]:

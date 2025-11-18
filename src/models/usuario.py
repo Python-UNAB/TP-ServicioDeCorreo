@@ -7,7 +7,7 @@ from .carpeta import Carpeta
 from .filtro import Filtro
 
 if TYPE_CHECKING:
-	from .mensaje import Mensaje
+	from .mensaje import Mensaje # -> Evita referencia circular para que no crashee el programa
 
 class Usuario:
 	def __init__(self, username: str, password: str):
