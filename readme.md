@@ -19,7 +19,7 @@
 - **Búsqueda recursiva**: la búsqueda recorre todas las carpetas y subcarpetas de forma recursiva. En el peor caso es `O(n)` donde `n` es la cantidad total de mensajes almacenados en todo el árbol de carpetas.
 - **Movimiento de mensajes**: la extracción y reubicación también recorre recursivamente, con complejidad `O(n)` en el peor caso si se visita cada carpeta del árbol.
 - **Aplicación de filtros**: por cada mensaje recibido se evalúan las reglas configuradas (`O(r)` donde `r` es la cantidad de filtros del usuario). La evaluación se detiene cuando un filtro coincide.
-- **Cola de urgentes (heap)**: las inserciones se realizan con `heapq` en `O(log n)` y las extracciones priorizan el menor valor (rango permitido 1-5), usando un contador para mantener el orden de llegada en empates.
+- **Cola de urgentes (heap)**: cada usuario mantiene su propio heap; las inserciones se realizan con `heapq` en `O(log n)` y las extracciones priorizan el menor valor (rango permitido 1-5), usando un contador para mantener el orden de llegada en empates.
 
 ## Algoritmos reutilizables
 
@@ -42,13 +42,10 @@ classDiagram
 
     class ServidorCorreo {
         -__usuarios: Dict~str, Usuario~
-        -__cola_urgentes: List~Tuple~int, int, Mensaje~~
         +registrar_usuario(username, password)
         +autenticar(username, password) Usuario
         +obtener_usuario(username) Usuario
         +enviar_mensaje(remitente, destinatario, asunto, cuerpo, urgente, prioridad)
-        +tiene_mensajes_urgentes() bool
-        +extraer_mensaje_urgente() Mensaje
     }
 
     class Usuario {
@@ -56,6 +53,7 @@ classDiagram
         -__password: str
         -__carpetas: Dict~str, Carpeta~
         -__filtros: List~Filtro~
+        -__cola_urgentes: List~Tuple~int, int, Mensaje~~
         +username: str
         +password: str
         +obtener_carpeta(ruta) Carpeta
@@ -66,6 +64,9 @@ classDiagram
         +agregar_filtro(nombre, condicion, destino_ruta)
         +listar_filtros() List~str~
         +aplicar_filtros(mensaje) str
+        +registrar_mensaje_urgente(mensaje)
+        +tiene_mensajes_urgentes() bool
+        +extraer_mensaje_urgente() Mensaje
     }
 
     class Filtro {
@@ -152,7 +153,7 @@ pytest -q
   - **Crear subcarpetas** anidadas (ejemplo: `Entrada/Proyectos/2025`).
   - **Buscar y mover mensajes** por texto en asunto o cuerpo, de forma recursiva en toda la jerarquía.
   - **Configurar filtros** por asunto para organizar la bandeja automáticamente.
-    - **Ver mensajes urgentes** pendientes desde el menú de usuario (se extraen respetando prioridad y orden de llegada).
+    - **Ver mensajes urgentes** en la bandeja personal del usuario (se extraen respetando prioridad y orden de llegada).
 
 ## Modalidad de trabajo:
 

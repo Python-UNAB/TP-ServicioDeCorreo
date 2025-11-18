@@ -92,8 +92,8 @@ Descripción de cada opción:
 
 5.9 Ver mensajes urgentes
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- Extrae mensajes de la cola de urgentes en orden de prioridad (1 a 5) y orden de llegada.
-- Cada mensaje se muestra en pantalla y se elimina de la cola una vez procesado.
+- Extrae los mensajes de la bandeja de urgentes personal del usuario en orden de prioridad (1 a 5) y orden de llegada.
+- Cada mensaje se muestra en pantalla y se elimina de la bandeja una vez procesado.
 
 5.10 Cerrar sesión
 ~~~~~~~~~~~~~~~~~~

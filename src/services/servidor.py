@@ -1,5 +1,3 @@
-import heapq
-from itertools import count
 from typing import Optional
 
 from ..models.usuario import Usuario
@@ -10,8 +8,6 @@ class ServidorCorreo:
 	"""Servidor principal que gestiona usuarios y enruta mensajes."""
 	def __init__(self):
 		self.__usuarios = {}  # Diccionario: username -> Usuario
-		self.__cola_urgentes = []  # Heap de mensajes urgentes (prioridad, orden, mensaje)
-		self.__contador_prioridad = count()  # Rompe empates manteniendo orden de llegada
 
 	def registrar_usuario(self, username, password):
 		if username in self.__usuarios:
@@ -31,7 +27,7 @@ class ServidorCorreo:
 	def enviar_mensaje(self, remitente, destinatario, asunto, cuerpo, *, urgente: bool = False, prioridad: Optional[int] = None):
 		"""Envía un mensaje entre dos usuarios registrados.
 
-		Si se indica `prioridad` (menor = más urgente) o `urgente=True`, el mensaje se encola en el heap de urgentes.
+		Si se indica `prioridad` (menor = más urgente) o `urgente=True`, el mensaje se encola en la bandeja urgente del destinatario.
 		"""
 		if remitente not in self.__usuarios:
 			raise ValueError("El remitente no existe.")
@@ -50,17 +46,5 @@ class ServidorCorreo:
 			entrada_dest = dest.obtener_carpeta("Entrada")
 		entrada_dest.agregar_mensaje(mensaje)
 		dest.aplicar_filtros(mensaje)
-		prioridad_heap = mensaje.prioridad
-		if prioridad_heap is not None:
-			heapq.heappush(self.__cola_urgentes, (prioridad_heap, next(self.__contador_prioridad), mensaje))
+		dest.registrar_mensaje_urgente(mensaje)
 		return mensaje
-
-	def tiene_mensajes_urgentes(self) -> bool:
-		"""Verifica si hay mensajes urgentes pendientes."""
-		return bool(self.__cola_urgentes)
-
-	def extraer_mensaje_urgente(self):
-		"""Extrae el mensaje urgente más antiguo (FIFO)."""
-		if not self.__cola_urgentes:
-			return None
-		return heapq.heappop(self.__cola_urgentes)[2]

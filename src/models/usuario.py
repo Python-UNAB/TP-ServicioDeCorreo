@@ -1,9 +1,13 @@
+import heapq
 from collections import deque
-from typing import Callable, Dict, List, Optional
+from itertools import count
+from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 
 from .carpeta import Carpeta
 from .filtro import Filtro
 
+if TYPE_CHECKING:
+	from .mensaje import Mensaje
 
 class Usuario:
 	def __init__(self, username: str, password: str):
@@ -12,6 +16,8 @@ class Usuario:
 		self.__password = password
 		self.__carpetas: Dict[str, Carpeta] = {}
 		self.__filtros: List[Filtro] = []
+		self.__cola_urgentes = []  # Heap (prioridad, orden, mensaje)
+		self.__contador_urgentes = count()
 		for nombre in ("Entrada", "Enviados"):
 			self.__carpetas[nombre] = Carpeta(nombre)
 
@@ -137,3 +143,18 @@ class Usuario:
 					destino.agregar_mensaje(mensaje)
 					return filtro.nombre
 		return None
+
+	def registrar_mensaje_urgente(self, mensaje: "Mensaje") -> None:
+		"""Agrega el mensaje a la bandeja de urgentes del usuario."""
+		prioridad = getattr(mensaje, "prioridad", None)
+		if prioridad is None:
+			return
+		heapq.heappush(self.__cola_urgentes, (prioridad, next(self.__contador_urgentes), mensaje))
+
+	def tiene_mensajes_urgentes(self) -> bool:
+		return bool(self.__cola_urgentes)
+
+	def extraer_mensaje_urgente(self):
+		if not self.__cola_urgentes:
+			return None
+		return heapq.heappop(self.__cola_urgentes)[2]

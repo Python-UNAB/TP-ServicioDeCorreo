@@ -179,12 +179,12 @@ def menu_usuario(servidor: ServidorCorreo, usuario):
                     print(f"- {nombre}")
                 print()
         elif op == "9":
-            if not servidor.tiene_mensajes_urgentes():
+            if not usuario.tiene_mensajes_urgentes():
                 print("No hay mensajes urgentes en espera.\n")
             else:
                 print("\n--- MENSAJES URGENTES ---")
-                while servidor.tiene_mensajes_urgentes():
-                    mensaje = servidor.extraer_mensaje_urgente()
+                while usuario.tiene_mensajes_urgentes():
+                    mensaje = usuario.extraer_mensaje_urgente()
                     if mensaje:
                         print(mensaje.mostrar_correo())
                         print()
@@ -199,6 +199,8 @@ def menu_servidor():
     servidor = ServidorCorreo()
     try:
         servidor.registrar_usuario("MikeMz", "1234")
+        servidor.registrar_usuario("Rgpodoba", "1234")
+        servidor.registrar_usuario("Jrubio", "1234")
     except ValueError:
         pass
     while True:

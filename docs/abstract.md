@@ -25,8 +25,8 @@
 
 ### Cola de mensajes urgentes (Heap)
 
-- **Heap de prioridad mínima**: se usa `heapq` para ordenar mensajes según prioridad numérica (1 = mayor urgencia, 5 = menor) manteniendo el orden de llegada en empates.
-- **Visualización en menú de usuario**: opción dedicada para listar y atender todos los urgentes pendientes.
+- **Heap por usuario**: cada `Usuario` mantiene su propia bandeja urgente organizada con `heapq` (1 = mayor urgencia, 5 = menor) conservando el orden de llegada en empates.
+- **Visualización en menú de usuario**: la opción dedicada procesa los urgentes personales del usuario autenticado.
 
 ### Correcciones aplicadas (para las entregas)
 

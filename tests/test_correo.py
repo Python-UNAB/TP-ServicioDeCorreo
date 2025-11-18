@@ -49,15 +49,16 @@ def test_cola_prioridad_urgentes():
 	m1 = servidor.enviar_mensaje("Miguel", "Rodrigo", "Mensaje 1", "Contenido 1", urgente=True)
 	m2 = servidor.enviar_mensaje("Miguel", "Rodrigo", "Mensaje 2", "Contenido 2", urgente=True)
 	m3 = servidor.enviar_mensaje("Miguel", "Rodrigo", "Mensaje 3", "Contenido 3", urgente=True)
-	assert servidor.tiene_mensajes_urgentes() is True
+	usuario_dest = servidor.obtener_usuario("Rodrigo")
+	assert usuario_dest.tiene_mensajes_urgentes() is True
 	# Para igual prioridad se respeta el orden de llegada (FIFO dentro de cada nivel)
-	primero = servidor.extraer_mensaje_urgente()
-	segundo = servidor.extraer_mensaje_urgente()
-	tercero = servidor.extraer_mensaje_urgente()
+	primero = usuario_dest.extraer_mensaje_urgente()
+	segundo = usuario_dest.extraer_mensaje_urgente()
+	tercero = usuario_dest.extraer_mensaje_urgente()
 	assert primero is m1  # El primero enviado es el primero extraído
 	assert segundo is m2
 	assert tercero is m3
-	assert servidor.extraer_mensaje_urgente() is None
+	assert usuario_dest.extraer_mensaje_urgente() is None
 
 
 def test_heap_prioridad_menor_sale_antes():
@@ -67,11 +68,12 @@ def test_heap_prioridad_menor_sale_antes():
 	m_baja = servidor.enviar_mensaje("Juan", "Bruno", "Info", "Normal", prioridad=5)
 	m_alta = servidor.enviar_mensaje("Juan", "Bruno", "Alerta", "Importante", prioridad=1)
 	m_media = servidor.enviar_mensaje("Juan", "Bruno", "Recordatorio", "Pendiente", prioridad=3)
-	assert servidor.tiene_mensajes_urgentes() is True
-	assert servidor.extraer_mensaje_urgente() is m_alta
-	assert servidor.extraer_mensaje_urgente() is m_media
-	assert servidor.extraer_mensaje_urgente() is m_baja
-	assert servidor.extraer_mensaje_urgente() is None
+	usuario_dest = servidor.obtener_usuario("Bruno")
+	assert usuario_dest.tiene_mensajes_urgentes() is True
+	assert usuario_dest.extraer_mensaje_urgente() is m_alta
+	assert usuario_dest.extraer_mensaje_urgente() is m_media
+	assert usuario_dest.extraer_mensaje_urgente() is m_baja
+	assert usuario_dest.extraer_mensaje_urgente() is None
 
 
 def test_mover_mensajes_sin_resultados():
