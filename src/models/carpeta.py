@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from typing import List, Dict
-from mailbox import Message
+
+from .mensaje import Mensaje
 from ..algorithms.busqueda_recursiva import (
     buscar_mensajes_en_carpeta,
     extraer_mensajes_en_carpeta,
@@ -12,7 +15,7 @@ class Carpeta:
 
     def __init__(self, nombre_carpeta):
         self.__nombre_carpeta = nombre_carpeta
-        self.__mensajes: List[Message] = []
+        self.__mensajes: List[Mensaje] = []
         self.__subcarpetas: Dict[str, Carpeta] = {}  # nombre -> Carpeta
 
     @property
