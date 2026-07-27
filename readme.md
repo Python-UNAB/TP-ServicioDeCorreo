@@ -162,4 +162,4 @@ pytest -q
 
 - Miguel Miguez
 - Rodrigo Podoba
-- Juan Rubio
+
